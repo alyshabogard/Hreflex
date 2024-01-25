@@ -1,0 +1,61 @@
+# Specify the file names to import
+excel = ['hreflex.xlsx'];              
+rc = xlsread(excel);
+
+** Update fpr each participant **
+# Participant identification number & timepoint (pre-treatment or post-treatment) 
+id = 01;        
+timepoint = 0;           # Timepoint with 0 being pre-treatment and 1 being post-treatment
+
+# Store intensity column as a variable
+intensity = rc(:,1);     # The stimulus intensity is the first column of the data frame 'rc'                                                                             
+
+# Extract mwave and hwave columns from trials 1 to 4 
+mwave_columns = rc(:, [3, 7, 11, 15]); # Assuming the m-wave data is stored in column 3 for trial 1, column 7 for trial 2, etc.
+hwave_columns = rc(:, [5, 9, 13, 17]); # Assuming the h-wave data is stored in column 5 for trial 1, column 9 for trial 2, etc.
+
+# Calculate the average across the rows 
+average_mwave = mean(mwave_columns, 2);
+average_hwave = mean(hwave_columns, 2);
+
+# Plot data
+plot(intensity, average_mwave, 'k.', 'LineWidth', 1.5, 'Marker', '.', 'MarkerSize', 30)
+hold on
+xlabel('Stimulus Intensity (mA)');
+ylabel('Peak-to-Peak Amplitude (mV)');
+title('H-reflex / M-wave Recruitment Curve');
+legend('off');
+plot(intensity, average_hwave,'r.', 'LineWidth', 1.5, 'Marker', '.', 'MarkerSize', 30)
+hold off
+
+# Calculate Hmax/Mmax and Create Dataframe
+[mmax, midx] = max(average_mwave);
+intensity_mmax = intensity(midx); # Index the corresponding intensity value
+
+[hmax, hidx] = max(average_hwave);
+intensity_hmax = intensity(hidx); %
+
+# Calculate Hmax/Mmax Ratio
+ratio = hmax/mmax;
+
+# Calculate the stimulus intensity at 50% of Mmax
+mmax_50 = 0.5 * mmax;
+[~, intensity50_idx] = min(abs(average_mwave - mmax_50)); # Find the index where mwave is closest to mmax_50
+intensity50 = intensity(intensity50_idx); # Index the corresponding intensity value
+
+# Normalize the intensity to the intensity at 50% of Mmax
+intensity_norm = intensity / intensity50;
+
+# Normalize the mwave and hwave to Mmax
+mnorm = average_mwave / mmax;
+hnorm = average_hwave / mmax;
+
+# Plot the normalized data
+plot(intensity_norm, mnorm, 'k.', 'LineWidth', 1.5, 'Marker', '.', 'MarkerSize', 30)
+hold on
+xlabel('Stimulus Intensity (Intensity at 50% of Mmax)');
+ylabel('Peak-to-Peak Amplitude (% Mmax)');
+title('Normalized H-reflex / M-wave Recruitment Curve');
+legend('off');
+plot(intensity, average_hwave,'r.', 'LineWidth', 1.5, 'Marker', '.', 'MarkerSize', 30)
+hold off
