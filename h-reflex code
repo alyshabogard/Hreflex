@@ -2,11 +2,6 @@
 excel = ['hreflex.xlsx'];              
 rc = xlsread(excel);
 
-** Update fpr each participant **
-# Participant identification number & timepoint (pre-treatment or post-treatment) 
-id = 01;        
-timepoint = 0;           # Timepoint with 0 being pre-treatment and 1 being post-treatment
-
 # Store intensity column as a variable
 intensity = rc(:,1);     # The stimulus intensity is the first column of the data frame 'rc'                                                                             
 
